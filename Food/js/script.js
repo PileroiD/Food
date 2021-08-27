@@ -204,15 +204,25 @@ window.addEventListener('DOMContentLoaded', () => {
         return await res.json();
     };
 
-    
-    getData('http://localhost:3000/menu')
+
+    // getData('http://localhost:3000/menu')
+    //     .then(data => {
+    //         // console.log(data);
+    //         data.forEach(({img, altimg, title, descr, price}) => {
+    //             new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+    //         });
+    //     });
+
+    axios.get('http://localhost:3000/menu')
         .then(data => {
-            // console.log(data);
-            data.forEach(({img, altimg, title, descr, price}) => {
+            data.data.forEach(({ img, altimg, title, descr, price }) => {
                 new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
             });
         });
 
+
+
+    // Вариант отправки GET запроса и получения данных без класса MenuCard
     // getData('http://localhost:3000/menu')
     //     .then(data => {
     //         createCard(data);
@@ -282,7 +292,7 @@ window.addEventListener('DOMContentLoaded', () => {
             form.insertAdjacentElement('afterend', statusMessage);
 
             const formData = new FormData(form);  // собирает все данные из формы
-            // console.log(formData.entries());
+            // console.log(formData.entries);
 
             const json = JSON.stringify(Object.fromEntries(formData.entries()));
             // console.log(json);
