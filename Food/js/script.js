@@ -338,6 +338,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // ------------------------------  SLIDER  -------------------------------------------------------------------------------------------------------------
 
     const slides = document.querySelectorAll('.offer__slide'),  // все слайды, их массив
+        slider = document.querySelector('.offer__slider'),
         prev = document.querySelector('.offer__slider-prev'),  // стрелочка указывающая на предыдущий слайд
         next = document.querySelector('.offer__slider-next'),  // стрелочка указывающая на следующий слайд
         total = document.querySelector('#total'),  // общее кол-во слайдов в цыфрах
@@ -358,7 +359,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     slidesField.style.width = slides.length * 100 + '%'; // кол-во слайдов умножаем на 100 % (4 * 100% = 400%)
-    slidesField.style.display = 'flex';  
+    slidesField.style.display = 'flex';
     slidesField.style.transition = '0.5s all'  // чтобы была плавная анимация 
 
     slidesWrapper.style.overflow = 'hidden';  //все что выходим за края экрана, будет скрыто
@@ -366,6 +367,41 @@ window.addEventListener('DOMContentLoaded', () => {
     slides.forEach(slide => {
         slide.style.width = width;  // для каждого слайда устанавливаем ширину обертки всех слайдов 
     });
+
+    slider.style.position = 'relative';
+
+    const indicators = document.createElement('ol'),
+        dots = [];
+
+    indicators.classList.add('carousel-indicators');
+
+    slider.append(indicators);
+
+    for (let i = 0; i < slides.length; i++) {
+        const dot = document.createElement('li');
+        dot.setAttribute('data-slide-to', i + 1);
+        dot.classList.add('dot');
+
+        if (i == 0) {
+            dot.style.opacity = 1;
+        }
+
+        indicators.append(dot);
+        dots.push(dot);
+    }
+
+
+    function showCurrentSlide() {
+        if (slides.length < 10) {
+            current.textContent = `0${slideIndex}`;
+        } else {
+            current.textContent = slideIndex;
+        }
+
+        dots.forEach(dot => dot.style.opacity = '.5');
+        dots[slideIndex - 1].style.opacity = 1;
+    }
+
 
     next.addEventListener('click', () => {
         if (offset == +width.slice(0, width.length - 2) * (slides.length - 1)) {  // если offset ровно ширине обгортки умноженой на количество слайдов-1
@@ -382,11 +418,8 @@ window.addEventListener('DOMContentLoaded', () => {
             slideIndex++;  // иначе перемещаем на следующий
         }
 
-        if (slides.length < 10) {
-            current.textContent = `0${slideIndex}`;
-        } else {
-            current.textContent = slideIndex;
-        }
+        showCurrentSlide();
+
     });
 
     prev.addEventListener('click', () => {
@@ -404,12 +437,21 @@ window.addEventListener('DOMContentLoaded', () => {
             slideIndex--;
         }
 
-        if (slides.length < 10) {
-            current.textContent = `0${slideIndex}`;
-        } else {
-            current.textContent = slideIndex;
-        }
+        showCurrentSlide();
     });
+
+    dots.forEach(dot => {
+        dot.addEventListener('click', (event) => {
+            const slideTo = event.target.getAttribute('data-slide-to');
+
+            slideIndex = slideTo;
+            offset = +width.slice(0, width.length - 2) * (slideTo - 1);
+
+            slidesField.style.transform = `translateX(-${offset}px)`;
+
+            showCurrentSlide();
+        });
+    })
 
 
     // showSlides(slideIndex);
@@ -435,11 +477,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
     //     slides[slideIndex - 1].style.display = 'block';
 
-        // if (slides.length < 10) {
-        //     current.innerHTML = `<span id="current">0${slideIndex}</span>`;
-        // } else {
-        //     total.innerHTML = `<span id="current">${slideIndex}</span>`;
-        // }
+    // if (slides.length < 10) {
+    //     current.innerHTML = `<span id="current">0${slideIndex}</span>`;
+    // } else {
+    //     total.innerHTML = `<span id="current">${slideIndex}</span>`;
+    // }
     // }
 
     // function plusSlides(n) {
