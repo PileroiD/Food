@@ -403,11 +403,17 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
 
+    function fromStrToNum(str) {
+        str = +str.replace(/\D/g, '');
+        return str;
+    }
+
+
     next.addEventListener('click', () => {
-        if (offset == +width.slice(0, width.length - 2) * (slides.length - 1)) {  // если offset ровно ширине обгортки умноженой на количество слайдов-1
+        if (offset == fromStrToNum(width) * (slides.length - 1)) {  // если offset ровно ширине обгортки умноженой на количество слайдов-1
             offset = 0;
         } else {  // иначе
-            offset += +width.slice(0, width.length - 2);  // каждый раз добавляем ширину обгортки
+            offset += fromStrToNum(width);  // каждый раз добавляем ширину обгортки
         }
 
         slidesField.style.transform = `translateX(-${offset}px)`;  // перемещаем по оси Х вправо
@@ -424,9 +430,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
     prev.addEventListener('click', () => {
         if (offset == 0) {
-            offset = +width.slice(0, width.length - 2) * (slides.length - 1);
+            offset = fromStrToNum(width) * (slides.length - 1);
         } else {
-            offset -= +width.slice(0, width.length - 2);
+            offset -= fromStrToNum(width);
         }
 
         slidesField.style.transform = `translateX(-${offset}px)`;
@@ -445,7 +451,7 @@ window.addEventListener('DOMContentLoaded', () => {
             const slideTo = event.target.getAttribute('data-slide-to');
 
             slideIndex = slideTo;
-            offset = +width.slice(0, width.length - 2) * (slideTo - 1);
+            offset = fromStrToNum(width) * (slideTo - 1);
 
             slidesField.style.transform = `translateX(-${offset}px)`;
 
