@@ -132,7 +132,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const modalTimerId = setTimeout(openModal, 30000);
+    // const modalTimerId = setTimeout(openModal, 30000);
 
     function showModalByScroll() {
         if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
@@ -188,35 +188,29 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    new MenuCard(
-        "img/tabs/vegy.jpg",
-        "vegy",
-        'Меню "Фитнес"',
-        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-        9,
-        ".menu .container",
-        'menu__item'
-    ).render();
+    const getData = async function (url) {
+        const res = await fetch(url);
 
-    new MenuCard(
-        "img/tabs/elite.jpg",
-        "elite",
-        'Меню “Премиум”',
-        'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-        15,
-        ".menu .container",
-        'menu__item'
-    ).render();
+        if (!res.ok) {
+            throw new Error(`Couldn't fetch ${url}, status: ${res.status}`);
+        }
 
-    new MenuCard(
-        "img/tabs/post.jpg",
-        "post",
-        'Меню "Постное"',
-        'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков. ',
-        5,
-        ".menu .container",
-        'menu__item'
-    ).render();
+        return await res.json();
+    };
+
+    getData('http://localhost:3000/menu')
+        .then(data => {
+            data.forEach(({ img, altimg, title, descr, price }) => {
+                new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+            });
+        });
+
+    // axios.get('http://localhost:3000/menu')
+    //     .then(data => {
+    //         data.data.forEach(({img, altimg, title, descr, price}) => {
+    //             new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+    //         });
+    //     });
 
 
     // Forms
@@ -229,10 +223,23 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     forms.forEach(item => {
-        postData(item);
+        bindPostData(item);
     });
 
-    function postData(form) {
+
+    const postData = async function (url, data) {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json; charset=utf-8',
+            },
+            body: data
+        });
+
+        return await res.json();
+    };
+
+    function bindPostData(form) {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
@@ -242,33 +249,25 @@ window.addEventListener('DOMContentLoaded', () => {
                 display: block;
                 margin: 0 auto;
             `;
-            
+
             form.insertAdjacentElement('afterend', statusMessage);
-            
+
             const formData = new FormData(form);
 
-            const object = {};
-            formData.forEach((value, key) => {
-                object[key] = value;
-            });
-            const json = JSON.stringify(object);
+            const json = JSON.stringify(Object.fromEntries(formData.entries()));
 
-            fetch('servesr.php', {
-                method: 'POST',
-                headers: {
-                    'Content-type': 'application/json; charset=utf-8',
-                },
-                body: json
-            }).then(data => data.text())
-            .then((data) => {
-                showThanksModal(message.success);
-                console.log(data);
-                statusMessage.remove();
-            }).catch(() => {
-                showThanksModal(message.failure);
-            }).finally(() => {
-                form.reset();
-            });
+            postData('http://localhost:3000/requests', json)
+                .then((data) => {
+                    showThanksModal(message.success);
+                    console.log(data);
+                    statusMessage.remove();
+                })
+                .catch(() => {
+                    showThanksModal(message.failure);
+                })
+                .finally(() => {
+                    form.reset();
+                });
         });
     }
 
@@ -292,7 +291,93 @@ window.addEventListener('DOMContentLoaded', () => {
             prevModalDialog.classList.add('show');
             prevModalDialog.classList.remove('hide');
             closeModal();
-        }, 1000);
+        }, 2000);
     }
+
+
+    // Slider
+
+    const slides = document.querySelectorAll('.offer__slide'),
+        prev = document.querySelector('.offer__slider-prev'),
+        next = document.querySelector('.offer__slider-next'),
+        total = document.querySelector('#total'),
+        current = document.querySelector('#current');      
+    let slideIndex = 1;
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // showSlides(slideIndex);
+
+    // if (slides.length < 10) {
+    //     total.textContent = '0' + slides.length;
+    // } else {
+    //     total.textContent = slides.length;
+    // }
+
+    // function showSlides(n) {
+    //     if (n > slides.length) {
+    //         slideIndex = 1;
+    //     }
+
+    //     if (n < 1) {
+    //         slideIndex = slides.length;
+    //     }
+
+    //     slides.forEach(slide => {
+    //         slide.style.display = 'none';
+    //     });
+
+    //     slides[slideIndex - 1].style.display = 'block';
+
+    //     if (slides.length < 10) {
+    //         current.textContent = '0' + slideIndex;
+    //     } else {
+    //         current.textContent = slideIndex;
+    //     }
+    // }
+
+    // function plusSlides(n) {
+    //     showSlides(slideIndex += n);
+    // }
+
+    // prev.addEventListener('click', () => {
+    //     plusSlides(-1);
+    // });
+
+    // next.addEventListener('click', () => {
+    //     plusSlides(1);
+    // });
+
+
+
+
+
+
+
+
+
+
+
+
 
 });
